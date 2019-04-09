@@ -9,6 +9,7 @@ export default class BrowserstackService {
     constructor (config) {
         this.config = config
         this.failures = 0
+        this.sessionBaseUrl = 'https://api.browserstack.com/automate/sessions'
     }
 
     /**
@@ -25,6 +26,9 @@ export default class BrowserstackService {
             config.key = 'NotSetKey'
         }
 
+        if (config.appium) {
+            this.sessionBaseUrl = 'https://api-cloud.browserstack.com/app-automate/sessions'
+        }
         this.config.user = config.user
         this.config.key = config.key
     }
@@ -87,7 +91,7 @@ export default class BrowserstackService {
 
     _update(sessionId, requestBody) {
         return new Promise((resolve, reject) => {
-            request.put(`https://api.browserstack.com/automate/sessions/${sessionId}.json`, {
+            request.put(`${this.sessionBaseUrl}/${sessionId}.json`, {
                 json: true,
                 auth: this.auth,
                 body: requestBody
@@ -112,7 +116,7 @@ export default class BrowserstackService {
     _printSessionURL() {
         const capabilities = global.browser.capabilities
         return new Promise((resolve, reject) => request.get(
-            `https://api.browserstack.com/automate/sessions/${this.sessionId}.json`,
+            `${this.sessionBaseUrl}/${this.sessionId}.json`,
             {
                 json: true,
                 auth: this.auth
